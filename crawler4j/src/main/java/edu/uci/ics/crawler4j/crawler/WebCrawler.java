@@ -49,6 +49,194 @@ import edu.uci.ics.crawler4j.url.WebURL;
  */
 public class WebCrawler implements Runnable {
 
+    private class AutoFixClass {
+        String movedToUrl;
+        PageFetcher pageFetcher;
+        List<WebURL> toSchedule;
+        WebURL curURL;
+        int statusCode;
+        HtmlParseData page;
+        int newDocId;
+        PageFetchResult fetchResult;
+        int webURL;
+
+        public AutoFixClass(PageFetcher pageFetcher, WebURL curURL, HtmlParseData page) {
+            this.pageFetcher = pageFetcher;
+            this.curURL = curURL;
+            this.page = page;
+        }
+
+        public String getMovedToUrl() {
+            return movedToUrl;
+        }
+
+        public void setMovedToUrl(String movedToUrl) {
+            this.movedToUrl = movedToUrl;
+        }
+
+        public Page getPage() {
+            return page;
+        }
+
+        public void setPage(Page page) {
+            this.page = page;
+        }
+
+        public List<WebURL> getToSchedule() {
+            return toSchedule;
+        }
+
+        public void setToSchedule(List<WebURL> toSchedule) {
+            this.toSchedule = toSchedule;
+        }
+
+        public int getStatusCode() {
+            return statusCode;
+        }
+
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+        }
+
+        public Page getCurURL() {
+            return curURL;
+        }
+
+        public void setCurURL(Page curURL) {
+            this.curURL = curURL;
+        }
+
+        public int getNewDocId() {
+            return newDocId;
+        }
+
+        public void setNewDocId(int newDocId) {
+            this.newDocId = newDocId;
+        }
+
+        public PageFetchResult getFetchResult() {
+            return fetchResult;
+        }
+
+        public void setFetchResult(PageFetchResult fetchResult) {
+            this.fetchResult = fetchResult;
+        }
+
+        public int getWebURL() {
+            return webURL;
+        }
+
+        public void setWebURL(int webURL) {
+            this.webURL = webURL;
+        }
+
+        public void autoFixMethod0(PageFetchResult fetchResult)
+                throws IOException, ParseException, InterruptedException {
+            fetchResult = pageFetcher.fetchPage(curURL);
+            int statusCode = fetchResult.getStatusCode();
+            handlePageStatusCode(curURL, statusCode,
+                    EnglishReasonPhraseCatalog.INSTANCE.getReason(statusCode, Locale.ENGLISH));
+            page.setFetchResponseHeaders(fetchResult.getResponseHeaders());
+            setFetchResult(fetchResult);
+        }
+
+        public void autoFixMethod1() throws IOException, ParseException, InterruptedException {
+            page.setRedirect(true);
+            String movedToUrl = fetchResult.getMovedToUrl();
+        }
+
+        public void autoFixMethod2() throws IOException, ParseException, InterruptedException {
+            onRedirectedToInvalidUrl(page);
+        }
+
+        public void autoFixMethod3() throws IOException, ParseException, InterruptedException {
+            page.setRedirectedToUrl(movedToUrl);
+            onRedirectedStatusCode(page);
+        }
+
+        public void autoFixMethod4() throws IOException, ParseException, InterruptedException {
+            int newDocId = docIdServer.getDocId(movedToUrl);
+        }
+
+        public void autoFixMethod5() throws IOException, ParseException, InterruptedException {
+            logger.debug("Redirect page: {} is already seen", curURL);
+        }
+
+        public void autoFixMethod6() throws IOException, ParseException, InterruptedException {
+            WebURL webURL = new WebURL();
+            webURL.setTldList(myController.getTldList());
+            webURL.setURL(movedToUrl);
+            webURL.setParentDocid(curURL.getParentDocid());
+        }
+
+        public void autoFixMethod7() throws IOException, ParseException, InterruptedException {
+            webURL.setParentUrl(curURL.getParentUrl());
+            webURL.setDepth(curURL.getDepth());
+            webURL.setDocid(-1);
+            webURL.setAnchor(curURL.getAnchor());
+        }
+
+        public void autoFixMethod8() throws IOException, ParseException, InterruptedException {
+            if (!shouldFollowLinksIn(webURL) || robotstxtServer.allows(webURL)) {
+                webURL.setDocid(docIdServer.getNewDocID(movedToUrl));
+                frontier.schedule(webURL);
+            } else {
+                logger.debug("Not visiting: {} as per the server's \"robots.txt\" policy", webURL.getURL());
+            }
+        }
+
+        public void autoFixMethod9() throws IOException, ParseException, InterruptedException {
+            String description = EnglishReasonPhraseCatalog.INSTANCE.getReason(fetchResult.getStatusCode(),
+                    Locale.ENGLISH);
+            String contentType = fetchResult.getEntity() == null ? ""
+                    : fetchResult.getEntity().getContentType() == null ? ""
+                            : fetchResult.getEntity().getContentType().getValue();
+            onUnexpectedStatusCode(curURL.getURL(), fetchResult.getStatusCode(), contentType, description);
+        }
+
+        public void autoFixMethod10() throws IOException, ParseException, InterruptedException {
+            logger.debug("Redirect page: {} has already been seen", curURL);
+        }
+
+        public void autoFixMethod11() throws IOException, ParseException, InterruptedException {
+            curURL.setURL(fetchResult.getFetchedUrl());
+            curURL.setDocid(docIdServer.getNewDocID(fetchResult.getFetchedUrl()));
+        }
+
+        public void autoFixMethod12() throws IOException, ParseException, InterruptedException {
+            if (!fetchResult.fetchContent(page, myController.getConfig().getMaxDownloadSize())) {
+                throw new ContentFetchException();
+            }
+        }
+
+        public void autoFixMethod13() throws IOException, ParseException, InterruptedException {
+            if (page.isTruncated()) {
+                logger.warn(
+                        "Warning: unknown page size exceeded max-download-size, truncated to: " + "({}), at URL: {}",
+                        myController.getConfig().getMaxDownloadSize(), curURL.getURL());
+            }
+            parser.parse(page, curURL.getURL());
+        }
+
+        public void autoFixMethod14() throws IOException, ParseException, InterruptedException {
+            if (robotstxtServer.allows(webURL)) {
+                webURL.setDocid(docIdServer.getNewDocID(webURL.getURL()));
+                toSchedule.add(webURL);
+            } else {
+                logger.debug("Not visiting: {} as per the server's \"robots.txt\" " + "policy", webURL.getURL());
+            }
+        }
+
+        public void autoFixMethod15() throws IOException, ParseException, InterruptedException {
+            boolean noIndex = myController.getConfig().isRespectNoIndex() && page.getContentType() != null
+                    && page.getContentType().contains("html")
+                    && ((HtmlParseData) page.getParseData()).getMetaTagValue("robots").contains("noindex");
+            if (!noIndex) {
+                visit(page);
+            }
+        }
+    }
+
     protected static final Logger logger = LoggerFactory.getLogger(WebCrawler.class);
 
     /**
@@ -417,15 +605,12 @@ public class WebCrawler implements Runnable {
             if (curURL == null) {
                 return;
             }
+            AutoFixClass autoFix0 = new AutoFixClass(pageFetcher, curURL, page);
+            autoFix0.autoFixMethod0(fetchResult);
+            page = autoFix0.getPage();
+            int statusCode = autoFix0.getStatusCode();
+            fetchResult = autoFix0.getFetchResult();
 
-            fetchResult = pageFetcher.fetchPage(curURL);
-            int statusCode = fetchResult.getStatusCode();
-            handlePageStatusCode(curURL, statusCode,
-                                 EnglishReasonPhraseCatalog.INSTANCE.getReason(statusCode,
-                                                                               Locale.ENGLISH));
-            // Finds the status reason for all known statuses
-
-            page.setFetchResponseHeaders(fetchResult.getResponseHeaders());
             page.setStatusCode(statusCode);
             if (statusCode < 200 ||
                 statusCode > 299) { // Not 2XX: 2XX status codes indicate success
@@ -437,81 +622,63 @@ public class WebCrawler implements Runnable {
                     statusCode == 308) { // is 3xx  todo
                     // follow https://issues.apache.org/jira/browse/HTTPCORE-389
 
-                    page.setRedirect(true);
-
-                    String movedToUrl = fetchResult.getMovedToUrl();
+                    AutoFixClass autoFix1 = new AutoFixClass();
+                        autoFix1.autoFixMethod1();
+                        movedToUrl = autoFix1.getMovedToUrl();
+                        page = autoFix1.getPage();
                     if (movedToUrl == null) {
-                        onRedirectedToInvalidUrl(page);
+                        AutoFixClass autoFix2 = new AutoFixClass();
+                        autoFix2.autoFixMethod2();
                         return;
                     }
-                    page.setRedirectedToUrl(movedToUrl);
-                    onRedirectedStatusCode(page);
-
+                    AutoFixClass autoFix3 = new AutoFixClass();
+                    autoFix3.autoFixMethod3();
+                    page = autoFix3.getPage();
                     if (myController.getConfig().isFollowRedirects()) {
-                        int newDocId = docIdServer.getDocId(movedToUrl);
+                        AutoFixClass autoFix4 = new AutoFixClass();
+                        autoFix4.autoFixMethod4();
+                        int newDocId = autoFix4.getNewDocId();
                         if (newDocId > 0) {
-                            logger.debug("Redirect page: {} is already seen", curURL);
+                            AutoFixClass autoFix5 = new AutoFixClass();
+                            autoFix5.autoFixMethod5();
                             return;
                         }
+                        AutoFixClass autoFix6 = new AutoFixClass();
+                        autoFix6.autoFixMethod6();
+                        webURL = autoFix6.getWebURL();
+                        AutoFixClass autoFix7 = new AutoFixClass();
+                        autoFix7.autoFixMethod7();
+                        webURL = autoFix7.getWebURL();
 
-                        WebURL webURL = new WebURL();
-                        webURL.setTldList(myController.getTldList());
-                        webURL.setURL(movedToUrl);
-                        webURL.setParentDocid(curURL.getParentDocid());
-                        webURL.setParentUrl(curURL.getParentUrl());
-                        webURL.setDepth(curURL.getDepth());
-                        webURL.setDocid(-1);
-                        webURL.setAnchor(curURL.getAnchor());
                         if (shouldVisit(page, webURL)) {
-                            if (!shouldFollowLinksIn(webURL) || robotstxtServer.allows(webURL)) {
-                                webURL.setDocid(docIdServer.getNewDocID(movedToUrl));
-                                frontier.schedule(webURL);
-                            } else {
-                                logger.debug(
-                                    "Not visiting: {} as per the server's \"robots.txt\" policy",
-                                    webURL.getURL());
-                            }
+                            AutoFixClass autoFix8 = new AutoFixClass();
+                            autoFix8.autoFixMethod8();
+                            webURL = autoFix8.getWebURL();
                         } else {
                             logger.debug("Not visiting: {} as per your \"shouldVisit\" policy",
                                          webURL.getURL());
                         }
                     }
                 } else { // All other http codes other than 3xx & 200
-                    String description =
-                        EnglishReasonPhraseCatalog.INSTANCE.getReason(fetchResult.getStatusCode(),
-                                                                      Locale.ENGLISH); // Finds
-                    // the status reason for all known statuses
-                    String contentType = fetchResult.getEntity() == null ? "" :
-                                         fetchResult.getEntity().getContentType() == null ? "" :
-                                         fetchResult.getEntity().getContentType().getValue();
-                    onUnexpectedStatusCode(curURL.getURL(), fetchResult.getStatusCode(),
-                                           contentType, description);
+                    AutoFixClass autoFix9 = new AutoFixClass();
+                    autoFix9.autoFixMethod9();
                 }
 
             } else { // if status code is 200
                 if (!curURL.getURL().equals(fetchResult.getFetchedUrl())) {
                     if (docIdServer.isSeenBefore(fetchResult.getFetchedUrl())) {
-                        logger.debug("Redirect page: {} has already been seen", curURL);
+                        AutoFixClass autoFix10 = new AutoFixClass();
+                        autoFix10.autoFixMethod10();
                         return;
                     }
-                    curURL.setURL(fetchResult.getFetchedUrl());
-                    curURL.setDocid(docIdServer.getNewDocID(fetchResult.getFetchedUrl()));
+                    AutoFixClass autoFix11 = new AutoFixClass();
+                    autoFix11.autoFixMethod11();
+                    curURL = autoFix11.getCurURL();
                 }
-
-                if (!fetchResult.fetchContent(page,
-                                              myController.getConfig().getMaxDownloadSize())) {
-                    throw new ContentFetchException();
-                }
-
-                if (page.isTruncated()) {
-                    logger.warn(
-                        "Warning: unknown page size exceeded max-download-size, truncated to: " +
-                        "({}), at URL: {}",
-                        myController.getConfig().getMaxDownloadSize(), curURL.getURL());
-                }
-
-                parser.parse(page, curURL.getURL());
-
+                AutoFixClass autoFix12 = new AutoFixClass();
+                autoFix12.autoFixMethod12();
+                AutoFixClass autoFix13 = new AutoFixClass();
+                autoFix13.autoFixMethod13();
                 if (shouldFollowLinksIn(page.getWebURL())) {
                     ParseData parseData = page.getParseData();
                     List<WebURL> toSchedule = new ArrayList<>();
@@ -530,14 +697,10 @@ public class WebCrawler implements Runnable {
                             webURL.setDepth((short) (curURL.getDepth() + 1));
                             if ((maxCrawlDepth == -1) || (curURL.getDepth() < maxCrawlDepth)) {
                                 if (shouldVisit(page, webURL)) {
-                                    if (robotstxtServer.allows(webURL)) {
-                                        webURL.setDocid(docIdServer.getNewDocID(webURL.getURL()));
-                                        toSchedule.add(webURL);
-                                    } else {
-                                        logger.debug(
-                                            "Not visiting: {} as per the server's \"robots.txt\" " +
-                                            "policy", webURL.getURL());
-                                    }
+                                    AutoFixClass autoFix14 = new AutoFixClass();
+                                    autoFix14.autoFixMethod14();
+                                    toSchedule = autoFix14.getToSchedule();
+                                    webURL = autoFix14.getWebURL();
                                 } else {
                                     logger.debug(
                                         "Not visiting: {} as per your \"shouldVisit\" policy",
@@ -552,17 +715,8 @@ public class WebCrawler implements Runnable {
                                  + "as per your \"shouldFollowLinksInPage\" policy",
                                  page.getWebURL().getURL());
                 }
-
-                boolean noIndex = myController.getConfig().isRespectNoIndex() &&
-                    page.getContentType() != null &&
-                    page.getContentType().contains("html") &&
-                    ((HtmlParseData)page.getParseData())
-                        .getMetaTagValue("robots").
-                        contains("noindex");
-
-                if (!noIndex) {
-                    visit(page);
-                }
+                AutoFixClass autoFix15 = new AutoFixClass();
+                autoFix15.autoFixMethod15();
             }
         } catch (PageBiggerThanMaxSizeException e) {
             onPageBiggerThanMaxSize(curURL.getURL(), e.getPageSize());
