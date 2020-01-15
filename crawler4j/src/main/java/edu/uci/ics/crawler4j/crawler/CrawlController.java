@@ -48,6 +48,155 @@ import edu.uci.ics.crawler4j.util.IO;
  */
 public class CrawlController {
 
+    private class AutoFixClass {
+        List<Object> crawlersLocalData;
+        Throwable crawlers;
+        T crawler;
+        List<Thread> threads;
+        boolean finished;
+
+        public AutoFixClass() {
+        }
+
+        public Throwable getCrawlers() {
+            return crawlers;
+        }
+
+        public void setCrawlers(Throwable crawlers) {
+            this.crawlers = crawlers;
+        }
+
+        public List<Object> getCrawlersLocalData() {
+            return crawlersLocalData;
+        }
+
+        public void setCrawlersLocalData(List<Object> crawlersLocalData) {
+            this.crawlersLocalData = crawlersLocalData;
+        }
+
+        public T getCrawler() {
+            return crawler;
+        }
+
+        public void setCrawler(T crawler) {
+            this.crawler = crawler;
+        }
+
+        public List<Thread> getThreads() {
+            return threads;
+        }
+
+        public void setThreads(List<Thread> threads) {
+            this.threads = threads;
+        }
+
+        public boolean getFinished() {
+            return finished;
+        }
+
+        public void setFinished(boolean finished) {
+            this.finished = finished;
+        }
+
+        public void autoFixMethod0(boolean finished) {
+            finished = false;
+            setError(null);
+            crawlersLocalData.clear();
+            final List<Thread> threads = new ArrayList<>();
+            final List<T> crawlers = new ArrayList<>();
+            setFinished(finished);
+        }
+
+        public void autoFixMethod1() {
+            for (int i = 1; i <= numberOfCrawlers; i++) {
+                T crawler = crawlerFactory.newInstance();
+                Thread thread = new Thread(crawler, "Crawler " + i);
+                crawler.setThread(thread);
+                crawler.init(i, this);
+                thread.start();
+                crawlers.add(crawler);
+                threads.add(thread);
+                logger.info("Crawler {} started", i);
+            }
+        }
+
+        public void autoFixMethod2(Thread thread) {
+            logger.info("Thread {} was dead, I'll recreate it", i);
+            T crawler = crawlerFactory.newInstance();
+            thread = new Thread(crawler, "Crawler " + (i + 1));
+            threads.remove(i);
+            threads.add(i, thread);
+            crawler.setThread(thread);
+            crawler.init(i + 1, controller);
+            thread.start();
+            crawlers.remove(i);
+        }
+
+        public void autoFixMethod3() {
+            Throwable t = crawlers.get(i).getError();
+            if (t != null && config.isHaltOnError()) {
+                throw new RuntimeException("error on thread [" + threads.get(i).getName() + "]", t);
+            }
+        }
+
+        public void autoFixMethod4(boolean someoneIsWorking) {
+            logger.info("It looks like no thread is working, waiting for " + config.getThreadShutdownDelaySeconds()
+                    + " seconds to make sure...");
+            sleep(config.getThreadShutdownDelaySeconds());
+            someoneIsWorking = false;
+        }
+
+        public void autoFixMethod5(boolean someoneIsWorking) {
+            for (int i = 0; i < threads.size(); i++) {
+                Thread thread = threads.get(i);
+                if (thread.isAlive() && crawlers.get(i).isNotWaitingForNewURLs()) {
+                    someoneIsWorking = true;
+                }
+            }
+        }
+
+        public void autoFixMethod6() {
+            long queueLength = frontier.getQueueLength();
+        }
+
+        public void autoFixMethod7() {
+            logger.info("No thread is working and no more URLs are in " + "queue waiting for another "
+                    + config.getThreadShutdownDelaySeconds() + " seconds to make sure...");
+        }
+
+        public void autoFixMethod8(long queueLength) {
+            sleep(config.getThreadShutdownDelaySeconds());
+            queueLength = frontier.getQueueLength();
+        }
+
+        public void autoFixMethod9() {
+            logger.info("All of the crawlers are stopped. Finishing the " + "process...");
+            frontier.finish();
+            for (T crawler : crawlers) {
+                crawler.onBeforeExit();
+                crawlersLocalData.add(crawler.getMyLocalData());
+            }
+        }
+
+        public void autoFixMethod10(boolean finished) {
+            logger.info("Waiting for " + config.getCleanupDelaySeconds() + " seconds before final clean up...");
+            sleep(config.getCleanupDelaySeconds());
+            frontier.close();
+            docIdServer.close();
+            pageFetcher.shutDown();
+            finished = true;
+            waitingLock.notifyAll();
+            setFinished(finished);
+        }
+
+        public void autoFixMethod11() {
+            monitorThread.start();
+            if (isBlocking) {
+                waitUntilFinish();
+            }
+        }
+    }
+
     static final Logger logger = LoggerFactory.getLogger(CrawlController.class);
     private final CrawlConfig config;
 
@@ -269,23 +418,17 @@ public class CrawlController {
     protected <T extends WebCrawler> void start(final WebCrawlerFactory<T> crawlerFactory,
                                                 final int numberOfCrawlers, boolean isBlocking) {
         try {
-            finished = false;
-            setError(null);
-            crawlersLocalData.clear();
-            final List<Thread> threads = new ArrayList<>();
-            final List<T> crawlers = new ArrayList<>();
-
-            for (int i = 1; i <= numberOfCrawlers; i++) {
-                T crawler = crawlerFactory.newInstance();
-                Thread thread = new Thread(crawler, "Crawler " + i);
-                crawler.setThread(thread);
-                crawler.init(i, this);
-                thread.start();
-                crawlers.add(crawler);
-                threads.add(thread);
-                logger.info("Crawler {} started", i);
-            }
-
+            AutoFixClass autoFix0 = new AutoFixClass(crawlersLocalData);
+            autoFix0.autoFixMethod0(finished);
+            crawlers = autoFix0.getCrawlers();
+            crawlersLocalData = autoFix0.getCrawlersLocalData();
+            threads = autoFix0.getThreads();
+            finished = autoFix0.getFinished();
+            AutoFixClass autoFix1 = new AutoFixClass();
+            autoFix1.autoFixMethod1();
+            crawlers = autoFix1.getCrawlers();
+            T crawler = autoFix1.getCrawler();
+            threads = autoFix1.getThreads();
             final CrawlController controller = this;
             Thread monitorThread = new Thread(new Runnable() {
 
@@ -301,85 +444,47 @@ public class CrawlController {
                                     Thread thread = threads.get(i);
                                     if (!thread.isAlive()) {
                                         if (!shuttingDown && !config.isHaltOnError()) {
-                                            logger.info("Thread {} was dead, I'll recreate it", i);
-                                            T crawler = crawlerFactory.newInstance();
-                                            thread = new Thread(crawler, "Crawler " + (i + 1));
-                                            threads.remove(i);
-                                            threads.add(i, thread);
-                                            crawler.setThread(thread);
-                                            crawler.init(i + 1, controller);
-                                            thread.start();
-                                            crawlers.remove(i);
+                                            AutoFixClass autoFix2 = new AutoFixClass();
+                                            autoFix2.autoFixMethod2(thread);
+                                            threads = autoFix2.getThreads();
+                                            crawler = autoFix2.getCrawler();
+                                            crawlers = autoFix2.getCrawlers();
                                             crawlers.add(i, crawler);
                                         }
                                     } else if (crawlers.get(i).isNotWaitingForNewURLs()) {
                                         someoneIsWorking = true;
                                     }
-                                    Throwable t = crawlers.get(i).getError();
-                                    if (t != null && config.isHaltOnError()) {
-                                        throw new RuntimeException(
-                                                "error on thread [" + threads.get(i).getName() + "]", t);
-                                    }
+                                    AutoFixClass autoFix3 = new AutoFixClass();
+                                    autoFix3.autoFixMethod3();
                                 }
                                 boolean shutOnEmpty = config.isShutdownOnEmptyQueue();
                                 if (!someoneIsWorking && shutOnEmpty) {
-                                    // Make sure again that none of the threads
-                                    // are
-                                    // alive.
-                                    logger.info(
-                                        "It looks like no thread is working, waiting for " +
-                                         config.getThreadShutdownDelaySeconds() +
-                                         " seconds to make sure...");
-                                    sleep(config.getThreadShutdownDelaySeconds());
-
-                                    someoneIsWorking = false;
-                                    for (int i = 0; i < threads.size(); i++) {
-                                        Thread thread = threads.get(i);
-                                        if (thread.isAlive() &&
-                                            crawlers.get(i).isNotWaitingForNewURLs()) {
-                                            someoneIsWorking = true;
-                                        }
-                                    }
+                                    AutoFixClass autoFix4 = new AutoFixClass();
+                                    autoFix4.autoFixMethod4(someoneIsWorking);
+                                    AutoFixClass autoFix5 = new AutoFixClass();
+                                    autoFix5.autoFixMethod5(someoneIsWorking);
                                     if (!someoneIsWorking) {
                                         if (!shuttingDown) {
-                                            long queueLength = frontier.getQueueLength();
+                                            AutoFixClass autoFix6 = new AutoFixClass();
+                                            autoFix6.autoFixMethod6();
                                             if (queueLength > 0) {
                                                 continue;
                                             }
-                                            logger.info(
-                                                "No thread is working and no more URLs are in " +
-                                                "queue waiting for another " +
-                                                config.getThreadShutdownDelaySeconds() +
-                                                " seconds to make sure...");
-                                            sleep(config.getThreadShutdownDelaySeconds());
-                                            queueLength = frontier.getQueueLength();
+                                            AutoFixClass autoFix7 = new AutoFixClass();
+                                            autoFix7.autoFixMethod7();
+                                            AutoFixClass autoFix8 = new AutoFixClass();
+                                            autoFix8.autoFixMethod8(queueLength);
                                             if (queueLength > 0) {
                                                 continue;
                                             }
                                         }
+                                        AutoFixClass autoFix9 = new AutoFixClass();
+                                        autoFix9.autoFixMethod9();
+                                        crawlersLocalData = autoFix9.getCrawlersLocalData();
+                                        AutoFixClass autoFix10 = new AutoFixClass();
+                                        autoFix10.autoFixMethod10(finished);
+                                        finished = autoFix10.getFinished();
 
-                                        logger.info(
-                                            "All of the crawlers are stopped. Finishing the " +
-                                            "process...");
-                                        // At this step, frontier notifies the threads that were
-                                        // waiting for new URLs and they should stop
-                                        frontier.finish();
-                                        for (T crawler : crawlers) {
-                                            crawler.onBeforeExit();
-                                            crawlersLocalData.add(crawler.getMyLocalData());
-                                        }
-
-                                        logger.info(
-                                            "Waiting for " + config.getCleanupDelaySeconds() +
-                                            " seconds before final clean up...");
-                                        sleep(config.getCleanupDelaySeconds());
-
-                                        frontier.close();
-                                        docIdServer.close();
-                                        pageFetcher.shutDown();
-
-                                        finished = true;
-                                        waitingLock.notifyAll();
                                         env.close();
 
                                         return;
@@ -405,12 +510,8 @@ public class CrawlController {
                 }
 
             });
-
-            monitorThread.start();
-
-            if (isBlocking) {
-                waitUntilFinish();
-            }
+            AutoFixClass autoFix11 = new AutoFixClass();
+            autoFix11.autoFixMethod11();
 
         } catch (Exception e) {
             if (config.isHaltOnError()) {
