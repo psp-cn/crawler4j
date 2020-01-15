@@ -19,6 +19,132 @@ package edu.uci.ics.crawler4j.url;
 
 public final class UrlResolver {
 
+    private class AutoFixClass {
+        int slashIndex;
+        String path;
+        Url url;
+        String relativeUrl;
+        int pathSegment;
+
+        public AutoFixClass(String relativeUrl) {
+            this.relativeUrl = relativeUrl;
+        }
+
+        public int getSlashIndex() {
+            return slashIndex;
+        }
+
+        public void setSlashIndex(int slashIndex) {
+            this.slashIndex = slashIndex;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public Url getUrl() {
+            return url;
+        }
+
+        public void setUrl(Url url) {
+            this.url = url;
+        }
+
+        public int getPathSegment() {
+            return pathSegment;
+        }
+
+        public void setPathSegment(int pathSegment) {
+            this.pathSegment = pathSegment;
+        }
+
+        public void autoFixMethod0() {
+            final Url url = parseUrl(relativeUrl);
+        }
+
+        public void autoFixMethod1(Url url) {
+            url.scheme = baseUrl.scheme;
+            setUrl(url);
+        }
+
+        public void autoFixMethod2(Url url) {
+            url.location = baseUrl.location;
+            setUrl(url);
+        }
+
+        public void autoFixMethod3(Url url) {
+            url.path = removeLeadingSlashPoints(url.path);
+            setUrl(url);
+        }
+
+        public void autoFixMethod4(Url url) {
+            url.path = baseUrl.path;
+            setUrl(url);
+        }
+
+        public void autoFixMethod5(Url url) {
+            url.parameters = baseUrl.parameters;
+            setUrl(url);
+        }
+
+        public void autoFixMethod6(Url url) {
+            url.query = baseUrl.query;
+            setUrl(url);
+        }
+
+        public void autoFixMethod7(String path) {
+            if (basePath != null) {
+                final int lastSlashIndex = basePath.lastIndexOf('/');
+                if (lastSlashIndex >= 0) {
+                    path = basePath.substring(0, lastSlashIndex + 1);
+                }
+            } else {
+                path = "/";
+            }
+            setPath(path);
+        }
+
+        public void autoFixMethod8(String path) {
+            path = path.concat(url.path);
+            int pathSegmentIndex;
+            while ((pathSegmentIndex = path.indexOf("/./")) >= 0) {
+                path = path.substring(0, pathSegmentIndex + 1).concat(path.substring(pathSegmentIndex + 3));
+            }
+            if (path.endsWith("/.")) {
+                path = path.substring(0, path.length() - 1);
+            }
+            setPath(path);
+        }
+
+        public void autoFixMethod9() {
+            final String pathSegment = path.substring(0, pathSegmentIndex);
+            final int slashIndex = pathSegment.lastIndexOf('/');
+        }
+
+        public void autoFixMethod10(String path) {
+            if (!"..".equals(pathSegment.substring(slashIndex))) {
+                path = path.substring(0, slashIndex + 1).concat(path.substring(pathSegmentIndex + 4));
+            }
+            setPath(path);
+        }
+
+        public void autoFixMethod11(String path) {
+            if (path.endsWith("/..")) {
+                final String pathSegment = path.substring(0, path.length() - 3);
+                final int slashIndex = pathSegment.lastIndexOf('/');
+                if (slashIndex >= 0) {
+                    path = path.substring(0, slashIndex + 1);
+                }
+            }
+            path = removeLeadingSlashPoints(path);
+            setPath(path);
+        }
+    }
+
     /**
      * Resolves a given relative URL against a base URL. See
      * <a href="http://www.faqs.org/rfcs/rfc1808.html">RFC1808</a>
@@ -251,7 +377,9 @@ public final class UrlResolver {
      * @return the resolved specification.
      */
     private static Url resolveUrl(final Url baseUrl, final String relativeUrl) {
-        final Url url = parseUrl(relativeUrl);
+        AutoFixClass autoFix0 = new AutoFixClass(relativeUrl);
+        autoFix0.autoFixMethod0();
+        url = autoFix0.getUrl();
         // Step 1: The base URL is established according to the rules of
         //         Section 3.  If the base URL is the empty string (unknown),
         //         the embedded URL is interpreted as an absolute URL and
@@ -272,41 +400,51 @@ public final class UrlResolver {
         if (url.scheme != null) {
             return url;
         }
-        //      c) Otherwise, the embedded URL inherits the scheme of
-        //         the base URL.
-        url.scheme = baseUrl.scheme;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1(url);
+        url = autoFix1.getUrl();
         // Step 3: If the embedded URL's <net_loc> is non-empty, we skip to
         //         Step 7.  Otherwise, the embedded URL inherits the <net_loc>
         //         (if any) of the base URL.
         if (url.location != null) {
             return url;
         }
-        url.location = baseUrl.location;
+        AutoFixClass autoFix2 = new AutoFixClass();
+        autoFix2.autoFixMethod2(url);
+        url = autoFix2.getUrl();
         // Step 4: If the embedded URL path is preceded by a slash "/", the
         //         path is not relative and we skip to Step 7.
         if ((url.path != null) && ((!url.path.isEmpty()) && (url.path.charAt(0) == '/'))) {
-            url.path = removeLeadingSlashPoints(url.path);
+            AutoFixClass autoFix3 = new AutoFixClass();
+            autoFix3.autoFixMethod3(url);
+            url = autoFix3.getUrl();
             return url;
         }
         // Step 5: If the embedded URL path is empty (and not preceded by a
         //         slash), then the embedded URL inherits the base URL path,
         //         and
         if (url.path == null) {
-            url.path = baseUrl.path;
+            AutoFixClass autoFix4 = new AutoFixClass();
+            autoFix4.autoFixMethod4(url);
+            url = autoFix4.getUrl();
             //  a) if the embedded URL's <params> is non-empty, we skip to
             //     step 7; otherwise, it inherits the <params> of the base
             //     URL (if any) and
             if (url.parameters != null) {
                 return url;
             }
-            url.parameters = baseUrl.parameters;
+            AutoFixClass autoFix5 = new AutoFixClass();
+            autoFix5.autoFixMethod5(url);
+            url = autoFix5.getUrl();
             //  b) if the embedded URL's <query> is non-empty, we skip to
             //     step 7; otherwise, it inherits the <query> of the base
             //     URL (if any) and we skip to step 7.
             if (url.query != null) {
                 return url;
             }
-            url.query = baseUrl.query;
+            AutoFixClass autoFix6 = new AutoFixClass();
+            autoFix6.autoFixMethod6(url);
+            url = autoFix6.getUrl();
             return url;
         }
         // Step 6: The last segment of the base URL's path (anything
@@ -316,61 +454,34 @@ public final class UrlResolver {
         //         then applied, in order, to the new path:
         final String basePath = baseUrl.path;
         String path = "";
+        AutoFixClass autoFix7 = new AutoFixClass();
+        autoFix7.autoFixMethod7(path);
+        path = autoFix7.getPath();
+        AutoFixClass autoFix8 = new AutoFixClass();
+        autoFix8.autoFixMethod8(path);
+        path = autoFix8.getPath();
 
-        if (basePath != null) {
-            final int lastSlashIndex = basePath.lastIndexOf('/');
-
-            if (lastSlashIndex >= 0) {
-                path = basePath.substring(0, lastSlashIndex + 1);
-            }
-        } else {
-            path = "/";
-        }
-        path = path.concat(url.path);
-        //      a) All occurrences of "./", where "." is a complete path
-        //         segment, are removed.
-        int pathSegmentIndex;
-
-        while ((pathSegmentIndex = path.indexOf("/./")) >= 0) {
-            path = path.substring(0, pathSegmentIndex + 1)
-                       .concat(path.substring(pathSegmentIndex + 3));
-        }
-        //      b) If the path ends with "." as a complete path segment,
-        //         that "." is removed.
-        if (path.endsWith("/.")) {
-            path = path.substring(0, path.length() - 1);
-        }
         //      c) All occurrences of "<segment>/../", where <segment> is a
         //         complete path segment not equal to "..", are removed.
         //         Removal of these path segments is performed iteratively,
         //         removing the leftmost matching pattern on each iteration,
         //         until no matching pattern remains.
         while ((pathSegmentIndex = path.indexOf("/../")) > 0) {
-            final String pathSegment = path.substring(0, pathSegmentIndex);
-            final int slashIndex = pathSegment.lastIndexOf('/');
-
+            AutoFixClass autoFix9 = new AutoFixClass();
+            autoFix9.autoFixMethod9();
+            slashIndex = autoFix9.getSlashIndex();
+            path = autoFix9.getPath();
+            pathSegment = autoFix9.getPathSegment();
             if (slashIndex < 0) {
                 continue;
             }
-            if (!"..".equals(pathSegment.substring(slashIndex))) {
-                path =
-                    path.substring(0, slashIndex + 1).concat(path.substring(pathSegmentIndex + 4));
-            }
+            AutoFixClass autoFix10 = new AutoFixClass();
+            autoFix10.autoFixMethod10(path);
+            path = autoFix10.getPath();
         }
-        //      d) If the path ends with "<segment>/..", where <segment> is a
-        //         complete path segment not equal to "..", that
-        //         "<segment>/.." is removed.
-        if (path.endsWith("/..")) {
-            final String pathSegment = path.substring(0, path.length() - 3);
-            final int slashIndex = pathSegment.lastIndexOf('/');
-
-            if (slashIndex >= 0) {
-                path = path.substring(0, slashIndex + 1);
-            }
-        }
-
-        path = removeLeadingSlashPoints(path);
-
+        AutoFixClass autoFix11 = new AutoFixClass();
+        autoFix11.autoFixMethod11(path);
+        path = autoFix11.getPath();
         url.path = path;
         // Step 7: The resulting URL components, including any inherited from
         //         the base URL, are recombined to give the absolute form of
