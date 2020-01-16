@@ -28,6 +28,32 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class HtmlContentHandler extends DefaultHandler {
 
+    private class AutoFixClass {
+        String href;
+        String tag;
+        ExtractedUrlAnchorPair curUrl;
+
+        public AutoFixClass(String href, String tag) {
+            this.href = href;
+            this.tag = tag;
+        }
+
+        public ExtractedUrlAnchorPair getCurUrl() {
+            return curUrl;
+        }
+
+        public void setCurUrl(ExtractedUrlAnchorPair curUrl) {
+            this.curUrl = curUrl;
+        }
+
+        public void autoFixMethod0(ExtractedUrlAnchorPair curUrl) {
+            curUrl = new ExtractedUrlAnchorPair();
+            curUrl.setHref(href);
+            curUrl.setTag(tag);
+            setCurUrl(curUrl);
+        }
+    }
+
     private static final int MAX_ANCHOR_LENGTH = 100;
 
     private enum Element {
@@ -140,16 +166,16 @@ public class HtmlContentHandler extends DefaultHandler {
     }
 
     private void addToOutgoingUrls(String href, String tag) {
-        curUrl = new ExtractedUrlAnchorPair();
-        curUrl.setHref(href);
-        curUrl.setTag(tag);
+        AutoFixClass autoFix0 = new AutoFixClass(href, tag);
+        autoFix0.autoFixMethod0(curUrl);
+        curUrl = autoFix0.getCurUrl();
         outgoingUrls.add(curUrl);
     }
 
     private void addToOutgoingUrls(String href, String tag, Attributes attributes) {
-        curUrl = new ExtractedUrlAnchorPair();
-        curUrl.setHref(href);
-        curUrl.setTag(tag);
+        AutoFixClass autoFix0 = new AutoFixClass(href, tag);
+        autoFix0.autoFixMethod0(curUrl);
+        curUrl = autoFix0.getCurUrl();
         for (int x = 0; x < attributes.getLength(); x++) {
             String attrName = attributes.getLocalName(x);
             String attrVal = attributes.getValue(attrName);
