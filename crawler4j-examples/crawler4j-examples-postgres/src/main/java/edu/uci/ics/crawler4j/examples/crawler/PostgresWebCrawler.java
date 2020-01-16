@@ -1,5 +1,6 @@
 package edu.uci.ics.crawler4j.examples.crawler;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -44,11 +45,8 @@ public class PostgresWebCrawler extends WebCrawler {
         logger.info("URL: " + url);
 
         if (page.getParseData() instanceof HtmlParseData) {
-            HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-            String text = htmlParseData.getText();
-            String html = htmlParseData.getHtml();
-            Set<WebURL> links = htmlParseData.getOutgoingUrls();
-
+            AutoFixClass autoFix0 = new AutoFixClass(page);
+            autoFix0.autoFixMethod0();
             logger.info("Text length: " + text.length());
             logger.info("Html length: " + html.length());
             logger.info("Number of outgoing links: " + links.size());
