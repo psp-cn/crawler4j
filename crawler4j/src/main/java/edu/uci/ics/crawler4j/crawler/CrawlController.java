@@ -48,6 +48,12 @@ import edu.uci.ics.crawler4j.util.IO;
  */
 public class CrawlController {
 
+    public void autoFixMethod0() {
+        frontier.close();
+        docIdServer.close();
+        pageFetcher.shutDown();
+    }
+
     static final Logger logger = LoggerFactory.getLogger(CrawlController.class);
     private final CrawlConfig config;
 
@@ -374,10 +380,7 @@ public class CrawlController {
                                             " seconds before final clean up...");
                                         sleep(config.getCleanupDelaySeconds());
 
-                                        frontier.close();
-                                        docIdServer.close();
-                                        pageFetcher.shutDown();
-
+                                        autoFixMethod0();
                                         finished = true;
                                         waitingLock.notifyAll();
                                         env.close();
@@ -392,9 +395,7 @@ public class CrawlController {
                             setError(e);
                             synchronized (waitingLock) {
                                 frontier.finish();
-                                frontier.close();
-                                docIdServer.close();
-                                pageFetcher.shutDown();
+                                autoFixMethod0();
                                 waitingLock.notifyAll();
                                 env.close();
                             }
