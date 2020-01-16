@@ -35,6 +35,45 @@ import edu.uci.ics.crawler4j.util.Util;
  * @author Yasser Ganjisaffar
  */
 public class WorkQueues {
+    private class AutoFixClass {
+        DatabaseEntry value;
+        Transaction txn;
+        DatabaseEntry key;
+
+        public AutoFixClass() {
+        }
+
+        public DatabaseEntry getValue() {
+            return value;
+        }
+
+        public void setValue(DatabaseEntry value) {
+            this.value = value;
+        }
+
+        public Transaction getTxn() {
+            return txn;
+        }
+
+        public void setTxn(Transaction txn) {
+            this.txn = txn;
+        }
+
+        public DatabaseEntry getKey() {
+            return key;
+        }
+
+        public void setKey(DatabaseEntry key) {
+            this.key = key;
+        }
+
+        public void autoFixMethod0() {
+            DatabaseEntry key = new DatabaseEntry();
+            DatabaseEntry value = new DatabaseEntry();
+            Transaction txn = beginTransaction();
+        }
+    }
+
     private final Database urlsDB;
     private final Environment env;
 
@@ -72,9 +111,11 @@ public class WorkQueues {
     public List<WebURL> get(int max) {
         synchronized (mutex) {
             List<WebURL> results = new ArrayList<>(max);
-            DatabaseEntry key = new DatabaseEntry();
-            DatabaseEntry value = new DatabaseEntry();
-            Transaction txn = beginTransaction();
+            AutoFixClass autoFix0 = new AutoFixClass();
+            autoFix0.autoFixMethod0();
+            DatabaseEntry value = autoFix0.getValue();
+            Transaction txn = autoFix0.getTxn();
+            DatabaseEntry key = autoFix0.getKey();
             try (Cursor cursor = openCursor(txn)) {
                 OperationStatus result = cursor.getFirst(key, value, null);
                 int matches = 0;
@@ -93,9 +134,11 @@ public class WorkQueues {
 
     public void delete(int count) {
         synchronized (mutex) {
-            DatabaseEntry key = new DatabaseEntry();
-            DatabaseEntry value = new DatabaseEntry();
-            Transaction txn = beginTransaction();
+            AutoFixClass autoFix0 = new AutoFixClass();
+            autoFix0.autoFixMethod0();
+            key = autoFix0.getKey();
+            value = autoFix0.getValue();
+            txn = autoFix0.getTxn();
             try (Cursor cursor = openCursor(txn)) {
                 OperationStatus result = cursor.getFirst(key, value, null);
                 int matches = 0;
