@@ -1,5 +1,6 @@
 package edu.uci.ics.crawler4j.examples.basic;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
@@ -51,15 +52,10 @@ public class BasicCrawlController {
         config.setHaltOnError(true);
 
         // Instantiate the controller for this crawl.
-        PageFetcher pageFetcher = new PageFetcher(config);
-        RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-        RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
-        CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
+        AutoFixClass autoFix0 = new AutoFixClass(config);
+        autoFix0.autoFixMethod0();
+        CrawlController controller = autoFix0.getController();
 
-        // For each crawl, you need to add some seed urls. These are the first
-        // URLs that are fetched and then the crawler starts following links
-        // which are found in these pages
-        controller.addSeed("https://www.ics.uci.edu/");
         controller.addSeed("https://www.ics.uci.edu/~lopes/");
         controller.addSeed("https://www.ics.uci.edu/~welling/");
 

@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.localdata;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -48,12 +49,9 @@ public class LocalDataCollectorController {
         config.setMaxPagesToFetch(10);
         config.setPolitenessDelay(1000);
 
-        PageFetcher pageFetcher = new PageFetcher(config);
-        RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-        RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
-        CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
-
-        controller.addSeed("https://www.ics.uci.edu/");
+        AutoFixClass autoFix0 = new AutoFixClass(config);
+        autoFix0.autoFixMethod0();
+        controller = autoFix0.getController();
         controller.start(LocalDataCollectorCrawler.class, numberOfCrawlers);
 
         List<Object> crawlersLocalData = controller.getCrawlersLocalData();
