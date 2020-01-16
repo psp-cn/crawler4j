@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.shutdown;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,19 +66,9 @@ public class ControllerWithShutdown {
     /*
      * Instantiate the controller for this crawl.
      */
-        PageFetcher pageFetcher = new PageFetcher(config);
-        RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-        RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
-        CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
-
-    /*
-     * For each crawl, you need to add some seed urls. These are the first
-     * URLs that are fetched and then the crawler starts following links
-     * which are found in these pages
-     */
-        controller.addSeed("https://www.ics.uci.edu/~welling/");
-        controller.addSeed("https://www.ics.uci.edu/~lopes/");
-        controller.addSeed("https://www.ics.uci.edu/");
+        AutoFixClass autoFix0 = new AutoFixClass(config);
+        autoFix0.autoFixMethod0();
+        CrawlController controller = autoFix0.getController();
 
     /*
      * Start the crawl. This is a blocking operation, meaning that your code
