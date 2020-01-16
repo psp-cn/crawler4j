@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.parser;
 
+import edu.uci.ics.crawler4j.parser.AutoFixClass;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,12 +71,15 @@ public class HtmlParseData implements ParseData {
 
     @Override
     public Set<WebURL> getOutgoingUrls() {
-        return outgoingUrls;
+        AutoFixClass autoFix0 = new AutoFixClass(outgoingUrls);
+        autoFix0.autoFixMethod0();
     }
 
     @Override
     public void setOutgoingUrls(Set<WebURL> outgoingUrls) {
-        this.outgoingUrls = outgoingUrls;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1(outgoingUrls);
+        outgoingUrls = autoFix1.getOutgoingUrls();
     }
 
     @Override
