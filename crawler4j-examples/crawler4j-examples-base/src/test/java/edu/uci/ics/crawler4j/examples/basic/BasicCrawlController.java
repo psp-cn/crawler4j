@@ -1,5 +1,6 @@
 package edu.uci.ics.crawler4j.examples.basic;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
@@ -16,16 +17,9 @@ public class BasicCrawlController {
         // Set the folder where intermediate crawl data is stored (e.g. list of urls that are extracted from previously
         // fetched pages and need to be crawled later).
         config.setCrawlStorageFolder("/tmp/crawler4j/");
-
-        // Be polite: Make sure that we don't send more than 1 request per second (1000 milliseconds between requests).
-        // Otherwise it may overload the target servers.
-        config.setPolitenessDelay(1000);
-
-        // You can set the maximum crawl depth here. The default value is -1 for unlimited depth.
-        config.setMaxDepthOfCrawling(2);
-
-        // You can set the maximum number of pages to crawl. The default value is -1 for unlimited number of pages.
-        config.setMaxPagesToFetch(1000);
+        AutoFixClass autoFix0 = new AutoFixClass(config);
+        autoFix0.autoFixMethod0();
+        config = autoFix0.getConfig();
 
         // Should binary data should also be crawled? example: the contents of pdf, or the metadata of images etc
         config.setIncludeBinaryContentInCrawling(false);
