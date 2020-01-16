@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.parser;
 
+import edu.uci.ics.crawler4j.parser.AutoFixClass;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -106,11 +107,14 @@ public class BinaryParseData implements ParseData {
 
     /** @return Parsed binary content or null */
     public String getHtml() {
-        return html;
+        AutoFixClass autoFix0 = new AutoFixClass(html);
+        autoFix0.autoFixMethod0();
     }
 
     public void setHtml(String html) {
-        this.html = html;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1(html);
+        html = autoFix1.getHtml();
     }
 
     @Override
