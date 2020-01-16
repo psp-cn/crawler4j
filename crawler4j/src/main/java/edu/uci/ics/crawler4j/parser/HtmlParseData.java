@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.parser;
 
+import edu.uci.ics.crawler4j.parser.AutoFixClass;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,11 +34,14 @@ public class HtmlParseData implements ParseData {
     private String contentCharset;
 
     public String getHtml() {
-        return html;
+        AutoFixClass autoFix0 = new AutoFixClass(html);
+        autoFix0.autoFixMethod0();
     }
 
     public void setHtml(String html) {
-        this.html = html;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1(html);
+        html = autoFix1.getHtml();
     }
 
     public String getText() {
