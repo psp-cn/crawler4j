@@ -1,5 +1,6 @@
 package edu.uci.ics.crawler4j.examples;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import org.flywaydb.core.Flyway;
 
 import com.google.common.io.Files;
@@ -30,11 +31,9 @@ public class SampleLauncher {
         /*
          * Instantiate the controller for this crawl.
          */
-        PageFetcher pageFetcher = new PageFetcher(config);
-        RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
-        RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
-        CrawlController controller = new CrawlController(config, pageFetcher, robotstxtServer);
-
+        AutoFixClass autoFix0 = new AutoFixClass(config);
+        autoFix0.autoFixMethod0();
+        controller = autoFix0.getController();
         /*
          * For each crawl, you need to add some seed urls. These are the first
          * URLs that are fetched and then the crawler starts following links
