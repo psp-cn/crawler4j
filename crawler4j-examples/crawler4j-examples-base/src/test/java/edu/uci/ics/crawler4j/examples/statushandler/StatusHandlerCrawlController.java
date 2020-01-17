@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.statushandler;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,24 +57,11 @@ public class StatusHandlerCrawlController {
         CrawlConfig config = new CrawlConfig();
 
         config.setCrawlStorageFolder(crawlStorageFolder);
+        AutoFixClass autoFix0 = new AutoFixClass(config);
+        autoFix0.autoFixMethod0();
+        config = autoFix0.getConfig();
 
-    /*
-     * Be polite: Make sure that we don't send more than 1 request per
-     * second (1000 milliseconds between requests).
-     */
-        config.setPolitenessDelay(1000);
-
-    /*
-     * You can set the maximum crawl depth here. The default value is -1 for
-     * unlimited depth
-     */
-        config.setMaxDepthOfCrawling(2);
-
-    /*
-     * You can set the maximum number of pages to crawl. The default value
-     * is -1 for unlimited number of pages
-     */
-        config.setMaxPagesToFetch(1000);
+    
 
     /*
      * Do you need to set a proxy? If so, you can use:
