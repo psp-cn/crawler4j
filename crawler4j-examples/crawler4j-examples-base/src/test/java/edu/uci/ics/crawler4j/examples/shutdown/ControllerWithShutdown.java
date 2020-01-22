@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.shutdown;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +36,8 @@ public class ControllerWithShutdown {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 2) {
-            logger.info("Needed parameters: ");
-            logger.info("\t rootFolder (it will contain intermediate crawl data)");
-            logger.info("\t numberOfCralwers (number of concurrent threads)");
+            AutoFixClass autoFix0 = new AutoFixClass(logger);
+            autoFix0.autoFixMethod0();
             return;
         }
 
@@ -45,7 +45,8 @@ public class ControllerWithShutdown {
      * crawlStorageFolder is a folder where intermediate crawl data is
      * stored.
      */
-        String crawlStorageFolder = args[0];
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1();
 
     /*
      * numberOfCrawlers shows the number of concurrent threads that should
@@ -53,11 +54,7 @@ public class ControllerWithShutdown {
      */
         int numberOfCrawlers = Integer.parseInt(args[1]);
 
-        CrawlConfig config = new CrawlConfig();
-
-        config.setCrawlStorageFolder(crawlStorageFolder);
-
-        config.setPolitenessDelay(1000);
+        CrawlConfig config = autoFix1.getConfig();
 
         // Unlimited number of pages can be crawled.
         config.setMaxPagesToFetch(-1);
