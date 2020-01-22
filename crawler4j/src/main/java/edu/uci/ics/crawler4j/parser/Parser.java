@@ -33,6 +33,15 @@ import edu.uci.ics.crawler4j.util.Util;
  */
 public class Parser {
 
+    public BinaryParseData autoFixMethod0() throws NotAllowedContentException, ParseException {
+        if (page.getContentCharset() == null) {
+            parseData.setTextContent(new String(page.getContentData()));
+        } else {
+            parseData.setTextContent(new String(page.getContentData(), page.getContentCharset()));
+        }
+        return parseData;
+    }
+
     private static final Logger logger = LoggerFactory.getLogger(Parser.class);
 
     private final CrawlConfig config;
@@ -89,12 +98,7 @@ public class Parser {
         } else if (Util.hasCssTextContent(page.getContentType())) { // text/css
             try {
                 CssParseData parseData = new CssParseData();
-                if (page.getContentCharset() == null) {
-                    parseData.setTextContent(new String(page.getContentData()));
-                } else {
-                    parseData.setTextContent(
-                        new String(page.getContentData(), page.getContentCharset()));
-                }
+                parseData = autoFixMethod0();
                 parseData.setOutgoingUrls(page.getWebURL());
                 page.setParseData(parseData);
             } catch (Exception e) {
@@ -104,12 +108,7 @@ public class Parser {
         } else if (Util.hasPlainTextContent(page.getContentType())) { // plain Text
             try {
                 TextParseData parseData = new TextParseData();
-                if (page.getContentCharset() == null) {
-                    parseData.setTextContent(new String(page.getContentData()));
-                } else {
-                    parseData.setTextContent(
-                        new String(page.getContentData(), page.getContentCharset()));
-                }
+                parseData = autoFixMethod0();
                 parseData.setOutgoingUrls(net.extractUrls(parseData.getTextContent()));
                 page.setParseData(parseData);
             } catch (Exception e) {
