@@ -1,5 +1,6 @@
 package edu.uci.ics.crawler4j.examples.multiple;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -45,25 +46,7 @@ public class BasicCrawler extends WebCrawler {
 
     @Override
     public void visit(Page page) {
-        int docid = page.getWebURL().getDocid();
-        String url = page.getWebURL().getURL();
-        int parentDocid = page.getWebURL().getParentDocid();
-
-        logger.debug("Docid: {}", docid);
-        logger.info("URL: {}", url);
-        logger.debug("Docid of parent page: {}", parentDocid);
-
-        if (page.getParseData() instanceof HtmlParseData) {
-            HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-            String text = htmlParseData.getText();
-            String html = htmlParseData.getHtml();
-            Set<WebURL> links = htmlParseData.getOutgoingUrls();
-
-            logger.debug("Text length: {}", text.length());
-            logger.debug("Html length: {}", html.length());
-            logger.debug("Number of outgoing links: {}", links.size());
-        }
-
-        logger.debug("=============");
+        AutoFixClass autoFix0 = new AutoFixClass(page, logger);
+        autoFix0.autoFixMethod0();
     }
 }
