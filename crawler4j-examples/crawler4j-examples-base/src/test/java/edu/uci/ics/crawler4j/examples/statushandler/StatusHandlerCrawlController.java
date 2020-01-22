@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.statushandler;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +36,8 @@ public class StatusHandlerCrawlController {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 2) {
-            logger.info("Needed parameters: ");
-            logger.info("\t rootFolder (it will contain intermediate crawl data)");
-            logger.info("\t numberOfCralwers (number of concurrent threads)");
+            AutoFixClass autoFix0 = new AutoFixClass(logger);
+            autoFix0.autoFixMethod0();
             return;
         }
 

@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.localdata;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -34,9 +35,8 @@ public class LocalDataCollectorController {
 
     public static void main(String[] args) throws Exception {
         if (args.length != 2) {
-            logger.info("Needed parameters: ");
-            logger.info("\t rootFolder (it will contain intermediate crawl data)");
-            logger.info("\t numberOfCralwers (number of concurrent threads)");
+            AutoFixClass autoFix0 = new AutoFixClass(logger);
+            autoFix0.autoFixMethod0();
             return;
         }
 
