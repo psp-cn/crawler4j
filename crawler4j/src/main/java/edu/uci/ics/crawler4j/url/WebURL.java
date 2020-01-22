@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.url;
 
+import edu.uci.ics.crawler4j.AutoFixClass;
 import java.io.Serializable;
 import java.util.Map;
 
@@ -205,11 +206,14 @@ public class WebURL implements Serializable {
      *      the anchor string is 'A sample anchor'
      */
     public String getAnchor() {
-        return anchor;
+        AutoFixClass autoFix0 = new AutoFixClass();
+        autoFix0.autoFixMethod0();
     }
 
     public void setAnchor(String anchor) {
-        this.anchor = anchor;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1();
+        anchor = autoFix1.getAnchor();
     }
 
     /**
