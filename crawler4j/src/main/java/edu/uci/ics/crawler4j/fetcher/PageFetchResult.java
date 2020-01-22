@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.fetcher;
 
+import edu.uci.ics.crawler4j.AutoFixClass;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
@@ -47,11 +48,14 @@ public class PageFetchResult {
     }
 
     public int getStatusCode() {
-        return statusCode;
+        AutoFixClass autoFix0 = new AutoFixClass();
+        autoFix0.autoFixMethod0();
     }
 
     public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1();
+        statusCode = autoFix1.getStatusCode();
     }
 
     public HttpEntity getEntity() {
