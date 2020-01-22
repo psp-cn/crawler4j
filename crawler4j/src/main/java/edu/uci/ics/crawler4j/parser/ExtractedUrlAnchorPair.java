@@ -1,5 +1,6 @@
 package edu.uci.ics.crawler4j.parser;
 
+import edu.uci.ics.crawler4j.AutoFixClass;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,19 +28,25 @@ public class ExtractedUrlAnchorPair {
     }
 
     public String getTag() {
-        return tag;
+        AutoFixClass autoFix0 = new AutoFixClass();
+        autoFix0.autoFixMethod0();
     }
 
     public void setTag(String tag) {
-        this.tag = tag;
+        AutoFixClass autoFix1 = new AutoFixClass();
+        autoFix1.autoFixMethod1();
+        tag = autoFix1.getTag();
     }
 
     public Map<String, String> getAttributes() {
-        return attributes;
+        AutoFixClass autoFix2 = new AutoFixClass();
+        autoFix2.autoFixMethod2();
     }
 
     public void setAttributes(Map<String, String> attributes) {
-        this.attributes = attributes;
+        AutoFixClass autoFix3 = new AutoFixClass();
+        autoFix3.autoFixMethod3(attributes);
+        attributes = autoFix3.getAttributes();
     }
 
     public String getAttribute(String name) {
