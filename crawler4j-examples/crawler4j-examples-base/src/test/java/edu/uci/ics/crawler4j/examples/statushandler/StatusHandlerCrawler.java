@@ -17,6 +17,7 @@
 
 package edu.uci.ics.crawler4j.examples.statushandler;
 
+import edu.uci.ics.crawler4j.examples.AutoFixClass;
 import java.util.regex.Pattern;
 
 import org.apache.http.HttpStatus;
@@ -44,8 +45,8 @@ public class StatusHandlerCrawler extends WebCrawler {
      */
     @Override
     public boolean shouldVisit(Page referringPage, WebURL url) {
-        String href = url.getURL().toLowerCase();
-        return !FILTERS.matcher(href).matches() && href.startsWith("https://www.ics.uci.edu/");
+        AutoFixClass autoFix0 = new AutoFixClass(url, FILTERS);
+        autoFix0.autoFixMethod0();
     }
 
     /**
