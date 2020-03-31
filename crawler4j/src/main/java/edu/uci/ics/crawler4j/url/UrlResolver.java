@@ -19,6 +19,218 @@ package edu.uci.ics.crawler4j.url;
 
 public final class UrlResolver {
 
+                               private class AutoFixClass {
+
+	                               int colonIndex;
+	                               int locationStartIndex;
+	                               int startIndex;
+	                               int locationEndIndex;
+	                               String spec;
+	                               int endIndex;
+	                               Url url;
+
+	                               public AutoFixClass(String spec) {
+		                               this.spec = spec;
+	                               }
+
+	                               public int getColonIndex() {
+		                               return colonIndex;
+	                               }
+
+	                               public void setColonIndex(int colonIndex) {
+		                               this.colonIndex = colonIndex;
+	                               }
+
+	                               public int getLocationStartIndex() {
+		                               return locationStartIndex;
+	                               }
+
+	                               public void setLocationStartIndex(int locationStartIndex) {
+		                               this.locationStartIndex = locationStartIndex;
+	                               }
+
+	                               public int getStartIndex() {
+		                               return startIndex;
+	                               }
+
+	                               public void setStartIndex(int startIndex) {
+		                               this.startIndex = startIndex;
+	                               }
+
+	                               public int getLocationEndIndex() {
+		                               return locationEndIndex;
+	                               }
+
+	                               public void setLocationEndIndex(int locationEndIndex) {
+		                               this.locationEndIndex = locationEndIndex;
+	                               }
+
+	                               public int getEndIndex() {
+		                               return endIndex;
+	                               }
+
+	                               public void setEndIndex(int endIndex) {
+		                               this.endIndex = endIndex;
+	                               }
+
+	                               public Url getUrl() {
+		                               return url;
+	                               }
+
+	                               public void setUrl(Url url) {
+		                               this.url = url;
+	                               }
+
+	                               public void autoFixMethod0()   {
+        final Url url = new Url();
+        int startIndex = 0;
+        int endIndex = spec.length();
+
+        // Section 2.4.1: Parsing the Fragment Identifier
+        //
+        //   If the parse string contains a crosshatch "#" character, then the
+        //   substring after the first (left-most) crosshatch "#" and up to the
+        //   end of the parse string is the <fragment> identifier. If the
+        //   crosshatch is the last character, or no crosshatch is present, then
+        //   the fragment identifier is empty. The matched substring, including
+        //   the crosshatch character, is removed from the parse string before
+        //   continuing.
+        //
+        //   Note that the fragment identifier is not considered part of the URL.
+        //   However, since it is often attached to the URL, parsers must be able
+        //   to recognize and set aside fragment identifiers as part of the
+        //   process.
+        final int crosshatchIndex = indexOf(spec, '#', startIndex, endIndex);
+
+        if (crosshatchIndex >= 0) {
+            url.fragment = spec.substring(crosshatchIndex + 1, endIndex);
+            endIndex = crosshatchIndex;
+        }
+        // Section 2.4.2: Parsing the Scheme
+        //
+        //   If the parse string contains a colon ":" after the first character
+        //   and before any characters not allowed as part of a scheme name (i.e.,
+        //   any not an alphanumeric, plus "+", period ".", or hyphen "-"), the
+        //   <scheme> of the URL is the substring of characters up to but not
+        //   including the first colon. These characters and the colon are then
+        //   removed from the parse string before continuing.
+        final int colonIndex = indexOf(spec, ':', startIndex, endIndex);
+
+	                               }
+
+	                               public void autoFixMethod1(int startIndex, Url url)   {
+        if (colonIndex > 0) {
+            final String scheme = spec.substring(startIndex, colonIndex);
+            if (isValidScheme(scheme)) {
+                url.scheme = scheme;
+                startIndex = colonIndex + 1;
+            }
+        }
+        // Section 2.4.3: Parsing the Network Location/Login
+        //
+        //   If the parse string begins with a double-slash "//", then the
+        //   substring of characters after the double-slash and up to, but not
+        //   including, the next slash "/" character is the network location/login
+        //   (<net_loc>) of the URL. If no trailing slash "/" is present, the
+        //   entire remaining parse string is assigned to <net_loc>. The double-
+        //   slash and <net_loc> are removed from the parse string before
+        //   continuing.
+        //
+        // Note: We also accept a question mark "?" or a semicolon ";" character as
+        //       delimiters for the network location/login (<net_loc>) of the URL.
+        final int locationStartIndex;
+        int locationEndIndex;
+
+	setStartIndex(startIndex);
+
+	setUrl(url);
+
+	                               }
+
+	                               public void autoFixMethod2(int startIndex)   {
+        if (spec.startsWith("//", startIndex)) {
+            locationStartIndex = startIndex + 2;
+            locationEndIndex = indexOf(spec, '/', locationStartIndex, endIndex);
+            if (locationEndIndex >= 0) {
+                startIndex = locationEndIndex;
+            }
+        } else {
+            locationStartIndex = -1;
+            locationEndIndex = -1;
+        }
+
+	setStartIndex(startIndex);
+
+	                               }
+
+	                               public void autoFixMethod3(int locationEndIndex, int startIndex, int endIndex, Url url)   {
+            if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
+                // The substring of characters after the double-slash and up to, but not
+                // including, the question mark "?" character is the network location/login
+                // (<net_loc>) of the URL.
+                locationEndIndex = questionMarkIndex;
+                startIndex = questionMarkIndex;
+            }
+            url.query = spec.substring(questionMarkIndex + 1, endIndex);
+            endIndex = questionMarkIndex;
+
+	setLocationEndIndex(locationEndIndex);
+
+	setStartIndex(startIndex);
+
+	setEndIndex(endIndex);
+
+	setUrl(url);
+
+	                               }
+
+	                               public void autoFixMethod4(int locationEndIndex, int startIndex, int endIndex, Url url)   {
+            if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
+                // The substring of characters after the double-slash and up to, but not
+                // including, the semicolon ";" character is the network location/login
+                // (<net_loc>) of the URL.
+                locationEndIndex = semicolonIndex;
+                startIndex = semicolonIndex;
+            }
+            url.parameters = spec.substring(semicolonIndex + 1, endIndex);
+            endIndex = semicolonIndex;
+
+	setLocationEndIndex(locationEndIndex);
+
+	setStartIndex(startIndex);
+
+	setEndIndex(endIndex);
+
+	setUrl(url);
+
+	                               }
+
+	                               public void autoFixMethod5(int locationEndIndex, Url url)   {
+        if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
+            // The entire remaining parse string is assigned to the network
+            // location/login (<net_loc>) of the URL.
+            locationEndIndex = endIndex;
+        } else if (startIndex < endIndex) {
+            url.path = spec.substring(startIndex, endIndex);
+        }
+
+	setLocationEndIndex(locationEndIndex);
+
+	setUrl(url);
+
+	                               }
+
+	                               public void autoFixMethod6(Url url)   {
+        if ((locationStartIndex >= 0) && (locationEndIndex >= 0)) {
+            url.location = spec.substring(locationStartIndex, locationEndIndex);
+        }
+
+	setUrl(url);
+
+	                               }
+
+                               }
+
     /**
      * Resolves a given relative URL against a base URL. See
      * <a href="http://www.faqs.org/rfcs/rfc1808.html">RFC1808</a>
@@ -80,72 +292,29 @@ public final class UrlResolver {
      * @return the parsed specification.
      */
     private static Url parseUrl(final String spec) {
-        final Url url = new Url();
-        int startIndex = 0;
-        int endIndex = spec.length();
+AutoFixClass autoFix0 = new AutoFixClass(spec);
+autoFix0.autoFixMethod0();
+colonIndex = autoFix0.getColonIndex();
+startIndex = autoFix0.getStartIndex();
+endIndex = autoFix0.getEndIndex();
+url = autoFix0.getUrl();
 
-        // Section 2.4.1: Parsing the Fragment Identifier
-        //
-        //   If the parse string contains a crosshatch "#" character, then the
-        //   substring after the first (left-most) crosshatch "#" and up to the
-        //   end of the parse string is the <fragment> identifier. If the
-        //   crosshatch is the last character, or no crosshatch is present, then
-        //   the fragment identifier is empty. The matched substring, including
-        //   the crosshatch character, is removed from the parse string before
-        //   continuing.
-        //
-        //   Note that the fragment identifier is not considered part of the URL.
-        //   However, since it is often attached to the URL, parsers must be able
-        //   to recognize and set aside fragment identifiers as part of the
-        //   process.
-        final int crosshatchIndex = indexOf(spec, '#', startIndex, endIndex);
 
-        if (crosshatchIndex >= 0) {
-            url.fragment = spec.substring(crosshatchIndex + 1, endIndex);
-            endIndex = crosshatchIndex;
-        }
-        // Section 2.4.2: Parsing the Scheme
-        //
-        //   If the parse string contains a colon ":" after the first character
-        //   and before any characters not allowed as part of a scheme name (i.e.,
-        //   any not an alphanumeric, plus "+", period ".", or hyphen "-"), the
-        //   <scheme> of the URL is the substring of characters up to but not
-        //   including the first colon. These characters and the colon are then
-        //   removed from the parse string before continuing.
-        final int colonIndex = indexOf(spec, ':', startIndex, endIndex);
 
-        if (colonIndex > 0) {
-            final String scheme = spec.substring(startIndex, colonIndex);
-            if (isValidScheme(scheme)) {
-                url.scheme = scheme;
-                startIndex = colonIndex + 1;
-            }
-        }
-        // Section 2.4.3: Parsing the Network Location/Login
-        //
-        //   If the parse string begins with a double-slash "//", then the
-        //   substring of characters after the double-slash and up to, but not
-        //   including, the next slash "/" character is the network location/login
-        //   (<net_loc>) of the URL. If no trailing slash "/" is present, the
-        //   entire remaining parse string is assigned to <net_loc>. The double-
-        //   slash and <net_loc> are removed from the parse string before
-        //   continuing.
-        //
-        // Note: We also accept a question mark "?" or a semicolon ";" character as
-        //       delimiters for the network location/login (<net_loc>) of the URL.
-        final int locationStartIndex;
-        int locationEndIndex;
+AutoFixClass autoFix1 = new AutoFixClass();
+autoFix1.autoFixMethod1(startIndex, url);
+startIndex = autoFix1.getStartIndex();
+url = autoFix1.getUrl();
 
-        if (spec.startsWith("//", startIndex)) {
-            locationStartIndex = startIndex + 2;
-            locationEndIndex = indexOf(spec, '/', locationStartIndex, endIndex);
-            if (locationEndIndex >= 0) {
-                startIndex = locationEndIndex;
-            }
-        } else {
-            locationStartIndex = -1;
-            locationEndIndex = -1;
-        }
+
+
+AutoFixClass autoFix2 = new AutoFixClass();
+autoFix2.autoFixMethod2(startIndex);
+locationStartIndex = autoFix2.getLocationStartIndex();
+locationEndIndex = autoFix2.getLocationEndIndex();
+startIndex = autoFix2.getStartIndex();
+
+
         // Section 2.4.4: Parsing the Query Information
         //
         //   If the parse string contains a question mark "?" character, then the
@@ -158,15 +327,14 @@ public final class UrlResolver {
         final int questionMarkIndex = indexOf(spec, '?', startIndex, endIndex);
 
         if (questionMarkIndex >= 0) {
-            if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
-                // The substring of characters after the double-slash and up to, but not
-                // including, the question mark "?" character is the network location/login
-                // (<net_loc>) of the URL.
-                locationEndIndex = questionMarkIndex;
-                startIndex = questionMarkIndex;
-            }
-            url.query = spec.substring(questionMarkIndex + 1, endIndex);
-            endIndex = questionMarkIndex;
+AutoFixClass autoFix3 = new AutoFixClass();
+autoFix3.autoFixMethod3(locationEndIndex, startIndex, endIndex, url);
+url = autoFix3.getUrl();
+locationEndIndex = autoFix3.getLocationEndIndex();
+endIndex = autoFix3.getEndIndex();
+startIndex = autoFix3.getStartIndex();
+
+
         }
         // Section 2.4.5: Parsing the Parameters
         //
@@ -179,15 +347,14 @@ public final class UrlResolver {
         final int semicolonIndex = indexOf(spec, ';', startIndex, endIndex);
 
         if (semicolonIndex >= 0) {
-            if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
-                // The substring of characters after the double-slash and up to, but not
-                // including, the semicolon ";" character is the network location/login
-                // (<net_loc>) of the URL.
-                locationEndIndex = semicolonIndex;
-                startIndex = semicolonIndex;
-            }
-            url.parameters = spec.substring(semicolonIndex + 1, endIndex);
-            endIndex = semicolonIndex;
+AutoFixClass autoFix4 = new AutoFixClass();
+autoFix4.autoFixMethod4(locationEndIndex, startIndex, endIndex, url);
+locationEndIndex = autoFix4.getLocationEndIndex();
+url = autoFix4.getUrl();
+endIndex = autoFix4.getEndIndex();
+startIndex = autoFix4.getStartIndex();
+
+
         }
         // Section 2.4.6: Parsing the Path
         //
@@ -197,17 +364,18 @@ public final class UrlResolver {
         //   whether or not it was present so that later processes can
         //   differentiate between relative and absolute paths. Often this is
         //   done by simply storing the preceding slash along with the path.
-        if ((locationStartIndex >= 0) && (locationEndIndex < 0)) {
-            // The entire remaining parse string is assigned to the network
-            // location/login (<net_loc>) of the URL.
-            locationEndIndex = endIndex;
-        } else if (startIndex < endIndex) {
-            url.path = spec.substring(startIndex, endIndex);
-        }
+AutoFixClass autoFix5 = new AutoFixClass();
+autoFix5.autoFixMethod5(locationEndIndex, url);
+locationEndIndex = autoFix5.getLocationEndIndex();
+url = autoFix5.getUrl();
+
+
         // Set the network location/login (<net_loc>) of the URL.
-        if ((locationStartIndex >= 0) && (locationEndIndex >= 0)) {
-            url.location = spec.substring(locationStartIndex, locationEndIndex);
-        }
+AutoFixClass autoFix6 = new AutoFixClass();
+autoFix6.autoFixMethod6(url);
+url = autoFix6.getUrl();
+
+
         return url;
     }
 
